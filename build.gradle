@@ -1,0 +1,35 @@
+group 'andutta'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+
+sourceCompatibility = 1.5
+version = '1.0'
+
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementatoin-Title': 'JVM agent',
+                'Implementation-Version': version,
+                'Premain-Class': 'org.andutta.jvminsider.InsiderAgent'
+
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+test {
+    println 'Build file  - ' + project.buildDir.absolutePath + '/libs/' + project.name + '-all-' + version + '.jar'
+    jvmArgs '-javaagent:' + project.buildDir.absolutePath + '/libs/' + project.name + '-all-' + version + '.jar'
+}
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // https://mvnrepository.com/artifact/javassist/javassist
+    compile group: 'javassist', name: 'javassist', version: '3.12.1.GA'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
